@@ -79,10 +79,9 @@ namespace GraFlight
             return Line;
         }
 
-        public static void ShowScore(int score)
+        public static void ShowScore(int score, int highScore)
         {
-            Console.WriteLine();
-            Console.WriteLine("Wynik: " + score);
+            Console.WriteLine("Wynik: " + score + " Najlepszy wynik: " + highScore);
         }
 
         public static void DisplayLine(char[] Line)
@@ -140,9 +139,11 @@ namespace GraFlight
         }
         
 
-        public static void Game()
+        public static void Game(int highScore)
         {
+            Console.Clear();
             int score = 0;
+            ShowScore(score, highScore);
             string gameStatus = "playing";
             char[][] CurrentLines = GetNumberOfLines(10);
             ConsoleKeyInfo keyUsed;
@@ -156,6 +157,11 @@ namespace GraFlight
                 DisplayLines(CurrentLines);
                 DisplayLine(playerLine);
                 keyUsed = Console.ReadKey();
+                if(keyUsed.Key == ConsoleKey.X || keyUsed.Key == ConsoleKey.Escape)
+                {
+                    Console.Clear();
+                    break;
+                }
                 playerLine = (MovePlayer(keyUsed, playerLine, CurrentLines[CurrentLines.Length - 1]));
                 Console.Clear();
 
@@ -166,18 +172,30 @@ namespace GraFlight
                 else
                 {
                     score++;
-                    ShowScore(score);
+                    if (score > highScore) highScore = score;
+                    ShowScore(score, highScore);
                 }
             }
             Console.WriteLine("Koniec gry!");
             Console.WriteLine("Twój wynik: " + score);
-            Console.ReadLine();
+            Console.WriteLine("Czy chcesz zagrać jeszcze raz? (t/n)");
+            ConsoleKeyInfo exitOrPlay = Console.ReadKey();
+            if(exitOrPlay.Key == ConsoleKey.T)
+            {
+                playerLine = new char[] { '_', '_', '_', '_', 'A', '_', '_', '_', '_' };
+                Game(highScore);
+            }
+            else
+            {
+                Console.WriteLine();
+                return;
+            }
 
         }
 
         public static void Main(string[] args)
         {
-            Game();
+            Game(0);
         }
     }
 }
