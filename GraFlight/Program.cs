@@ -44,6 +44,7 @@ namespace GraFlight
             return NextLine;
         }
 
+        //Przesunięcie linii o jedną w dół i dodanie nowej na końcu
         public static char[][] MoveLines(char[][] Lines)
         {
             for (int i = Lines.Length-1; i >= 0; i--)
@@ -59,8 +60,8 @@ namespace GraFlight
             }
             return Lines;
         }
-
-        //Dodaj, że jeśli gracz ma pierwszy ruch, to nie powinno być więcej niż 2 przeszkody na środkowych polach
+        
+        //Generowanie linii z losowym rozmieszczeniem przeszkód
         public static char[] GenerateLine()
         {
             char[] Line = new char[] { '_', '_', '_', '_', '_', '_', '_', '_', '_' };
@@ -79,11 +80,13 @@ namespace GraFlight
             return Line;
         }
 
+        //Pokazanie wyniku
         public static void ShowScore(int score, int highScore)
         {
             Console.WriteLine("Wynik: " + score + " Najlepszy wynik: " + highScore);
         }
 
+        //Wyświetlenie pojedynczej linii
         public static void DisplayLine(char[] Line)
         {
             string LineString = String.Empty;
@@ -106,6 +109,7 @@ namespace GraFlight
             Console.WriteLine();
         }
 
+        //Wyświen\tlenie danej ilości linii
         public static void DisplayLines(char[][] Lines)
         {
             for (int i = 0; i < Lines.Length; i++)
@@ -114,6 +118,7 @@ namespace GraFlight
             }
         }
 
+        //Generowanie danej ilości losowych linii z przeszkodami
         public static char[][] GetNumberOfLines(int q)
         {
             char[][] Lines = new char[q][];
@@ -124,6 +129,7 @@ namespace GraFlight
             return Lines;
         }
 
+        //Pobranie losowego indeksu
         public static int RandomIndex()
         {
             Random random = new Random(DateTime.Now.Millisecond);
@@ -131,6 +137,7 @@ namespace GraFlight
             return ranIndex;
         }
 
+        //Funkcja wypisująca znak w danym kolorze
         public static void ColoredWrite(ConsoleColor color, char character)
         {
             Console.ForegroundColor = color;
@@ -139,38 +146,59 @@ namespace GraFlight
         }
         
 
-        public static void Game(int highScore)
+        public static void Game(int highScore = 0)
         {
+            //Czyszczenie konsoli
             Console.Clear();
             int score = 0;
+
+            //Pokazanie wyniku
             ShowScore(score, highScore);
-            string gameStatus = "playing";
+
+            //Flaga sprawdzająca, czy gra się toczy
+            bool playing = true;
+
+            //Pobranie linii z przeszkodami przed graczem
             char[][] CurrentLines = GetNumberOfLines(10);
             ConsoleKeyInfo keyUsed;
-            while (gameStatus == "playing")
+
+            while (playing)
             {
                 if (score != 0)
                 {
+                    //Przesunięcie linii, jeśli gracz wykonał ruch
                     CurrentLines = MoveLines(CurrentLines);
                 }
 
+                //Wyświetlenie linii przeszkód
                 DisplayLines(CurrentLines);
+
+                //Wyświetlenie linii gracza
                 DisplayLine(playerLine);
+
+                //Pobranie przycisku
                 keyUsed = Console.ReadKey();
-                if(keyUsed.Key == ConsoleKey.X || keyUsed.Key == ConsoleKey.Escape)
+
+                //Po wciśnięciu X gra się kończy
+                if(keyUsed.Key == ConsoleKey.X)
                 {
+                    playing = false;
                     Console.Clear();
                     break;
                 }
+
+                //Ruch użytkownika
                 playerLine = (MovePlayer(keyUsed, playerLine, CurrentLines[CurrentLines.Length - 1]));
                 Console.Clear();
 
+                //X jest zwracany, gdy gracz wykonał ruch, w którym uderzył w przeszkodę
                 if(playerLine[0] == 'X')
                 {
-                    gameStatus = "lost";
+                    playing = false;
                 }
                 else
                 {
+                    //Wynik jest zwiększany
                     score++;
                     if (score > highScore) highScore = score;
                     ShowScore(score, highScore);
@@ -180,6 +208,7 @@ namespace GraFlight
             Console.WriteLine("Twój wynik: " + score);
             Console.WriteLine("Czy chcesz zagrać jeszcze raz? (t/n)");
             ConsoleKeyInfo exitOrPlay = Console.ReadKey();
+
             if(exitOrPlay.Key == ConsoleKey.T)
             {
                 playerLine = new char[] { '_', '_', '_', '_', 'A', '_', '_', '_', '_' };
@@ -195,7 +224,7 @@ namespace GraFlight
 
         public static void Main(string[] args)
         {
-            Game(0);
+            Game();
         }
     }
 }
